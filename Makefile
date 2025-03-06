@@ -1,10 +1,14 @@
 CPPFLAGS	= -E -P -nostdinc -IInclude -undef -x assembler-with-cpp
 CPP		= clang
-DTC		= dtc
+APPLEDTCDIR = dtc-AppleDeviceTree
+DTC		= $(APPLEDTCDIR)/dtc
 DEVICETREES	= RealView.devicetree Nokia_RX51.devicetree \
 	TI_BeagleXM.devicetree USBarmory_MkI.devicetree
 
-all: $(DEVICETREES)
+all: APPLEDTC $(DEVICETREES)
+
+APPLEDTC:
+	make -C $(APPLEDTCDIR)
 
 RealView.devicetree: ARM/RealView-PB-A8/devicetree.dtsi
 	$(CPP) $(CPPFLAGS) $< -o $@.p
@@ -28,3 +32,4 @@ USBarmory_MkI.devicetree: Freescale/iMX53/USBarmory_MkI/devicetree.dtsi
 
 clean:
 	rm -f $(DEVICETREES)
+	make -C $(APPLEDTCDIR) clean

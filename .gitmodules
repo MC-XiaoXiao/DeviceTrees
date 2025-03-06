@@ -1,0 +1,3 @@
+[submodule "dtc-AppleDeviceTree"]
+	path = dtc-AppleDeviceTree
+	url = https://github.com/MC-XiaoXiao/dtc-AppleDeviceTree.git
