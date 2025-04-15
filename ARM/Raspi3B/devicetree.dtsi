@@ -1,0 +1,260 @@
+/*
+ * ARM RealView PB-A8 DeviceTree.
+ */
+
+#include "Skeleton.dtsi"
+ 
+/ {
+    compatible = "arm,raspi3b", "AppleARM";
+    model = "Raspberry Pi 3 Model B";
+    target-type = "raspi3b";
+    #address-cells = <2>;
+    #size-cells = <2>;
+ 
+    /*
+     * CPU nodes. (Cortex-A53) 
+     */
+    cpus {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        cpu0 {
+            cpu-id = <0x0>;
+            device_type = "cpu";
+            compatible = "ARM,v8", "ARM,cortex-a53";
+            reg = <0x0>;
+            state = "running";
+            bus-frequency = <0 0>;
+            interrupt-parent = <&intc>;
+        };
+
+        /*cpu1 {
+            cpu-id = <0x1>;
+            device_type = "cpu";
+            compatible = "arm,armv8";
+            reg = <0x1>;
+            state = "waiting";
+            interrupt-parent = <&intc>;
+        };
+
+        cpu2 {
+            cpu-id = <0x2>;
+            device_type = "cpu";
+            compatible = "arm,armv8";
+            reg = <0x2>;
+            state = "waiting";
+            interrupt-parent = <&intc>;
+        };
+
+        cpu3 {
+            cpu-id = <0x3>;
+            device_type = "cpu";
+            compatible = "arm,armv8";
+            reg = <0x3>;
+            state = "waiting";
+            interrupt-parent = <&intc>;
+        };*/
+    };
+
+    /*
+     * ARM IO bus.
+     */
+    arm-io {
+        device_type = "arm-io";
+        compatible = "arm-io,bcm2837";
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges = < 0x3f000000 0 0x3f000000 0 0x1000000 0>,
+                 < 0x40000000 0 0x40000000 0 0x00001000 0>;
+
+        /*clocks: cprman@7e101000 {
+            compatible = "brcm,bcm2835-cprman";
+            #clock-cells = <1>;
+            reg = <0x3f101000 0x2000>;
+
+
+
+
+
+            clocks = <&clk_osc>,
+                <&dsi0 0>, <&dsi0 1>, <&dsi0 2>,
+                <&dsi1 0>, <&dsi1 1>, <&dsi1 2>;
+        };*/
+
+        local_intc: local_intc@40000000 {
+            compatible = "brcm,bcm2836-l1-intc";
+            reg = <0x40000000 0 0x100 0>;
+            interrupt-controller;
+            #interrupt-cells = <1>;
+            interrupt-parent = <&local_intc>;
+        };
+
+        intc: interrupt-controller@7e00b200 {
+            #address-cells = <2>;
+		    #size-cells = <2>;
+            device_type = "interrupt-controller";
+            compatible = "brcm,bcm2835-armctrl-ic";
+            #main-cpus = <1>;
+            reg = <0x3f00b200 0 0x200 0>;
+            interrupt-controller = "master";
+            #interrupt-cells = <1>;
+            //interrupts = <8>;
+            //interrupt-parent = <&local_intc>;
+        };
+        
+        timer0 {
+            compatible = "brcm,bcm2835-system-timer", "arm,primecell";
+            device_type = "timer";
+            reg = <0x3f003000 0 0x1000 0>;
+            clock-frequency = <1000000>;
+            interrupt-parent = <&intc>;
+            interrupts = <36>;
+        };
+
+        clocks: cprman@7e101000 {
+			compatible = "brcm,bcm2835-cprman";
+			#clock-cells = <1>;
+			reg = <0x7e101000 0 0x2000 0>;
+
+			/* CPRMAN derives almost everything from the
+			 * platform's oscillator.  However, the DSI
+			 * pixel clocks come from the DSI analog PHY.
+			 */
+			// clocks = <&clk_osc>,
+			// 	<&dsi0 0>, <&dsi0 1>, <&dsi0 2>,
+			// 	<&dsi1 0>, <&dsi1 1>, <&dsi1 2>;
+		};
+
+        gpio: gpio {
+            compatible = "gpio,bcm2837";
+            interrupt-parent = <&intc>;
+            #gpio-int-groups = <0x04>;
+            #gpio-pins = <54>;
+            gpio-ranges = <&gpio 0 0 54>;
+            
+            device_type = "interrupt-controller";
+            role = "AP";
+            interrupt-controller;
+            #address-cells = <0x0>;
+            #interrupt-cells = <0x2>;
+            reg = <0x3F200000 0 0xb4 0 >;
+            interrupts = <57 58 59 60>;
+
+            sdhost_gpio48: sdhost-gpio48 {
+				brcm,pins = <48 49 50 51 52 53>;
+				brcm,function = <0>;
+			};
+        };
+
+        dma: dma@7e007000 {
+            interrupt-parent = <&intc>;
+            compatible = "brcm,bcm2835-dma";
+            reg = <0x3f007000 0 0xf00 0>;
+            /*interrupts = <1 16>,
+            <1 17>,
+            <1 18>,
+            <1 19>,
+            <1 20>,
+            <1 21>,
+            <1 22>,
+            <1 23>,
+            <1 24>,
+            <1 25>,
+            <1 26>,
+
+            <1 27>,
+            <1 27>,
+            <1 27>,
+            <1 27>,
+
+            <1 28>;*/
+            interrupts = <48>,
+                         <49>,
+                         <50>,
+                         <51>,
+                         <52>,
+                         <53>,
+                         <53>,
+                         <55>,
+                         <56>,
+                         <57>,
+                         <58>,
+
+                         <59>,
+                         <59>,
+                         <59>,
+                         <59>,
+
+                         <60>;
+            interrupt-names = "dma0",
+            "dma1",
+            "dma2",
+            "dma3",
+            "dma4",
+            "dma5",
+            "dma6",
+            "dma7",
+            "dma8",
+            "dma9",
+            "dma10",
+            "dma11",
+            "dma12",
+            "dma13",
+            "dma14",
+            "dma-shared-all";
+            #dma-cells = <1>;
+            brcm,dma-channel-mask = <0x7f35>;
+        };
+
+        sdhost: mmc@7e202000 {
+            compatible = "brcm,bcm2835-sdhost";
+            device_type = "sdhost";
+            interrupt-parent = <&intc>;
+            interrupts = <88>;
+            dmas = <&dma 13>;
+
+            gpio-sd0_clk = <48 4 0x5041>;
+            gpio-sd0_cmd = <49 4 0x5041>;
+            gpio-sd0_data0 = <50 4 0x5041>;
+            gpio-sd0_data1 = <51 4 0x5041>;
+            gpio-sd0_data2 = <52 4 0x5041>;
+            gpio-sd0_data3 = <53 4 0x5041>;
+            
+            dma-parent = <&dma>;
+            dma-channels = <0x2000000D>;
+            dma-names = "rx-tx";
+            brcm,pio-limit = <1>;
+            bus-width = <4>;
+            brcm,overclock-50 = <0>;
+            reg = <0x3f202000 0 0x100 0>;
+        }; 
+
+        aux {
+            reg = <0x3F215000 0 0x1000 0 >;
+        };
+    };
+
+    defaults {
+            panic-reset-type = <0x2>;
+    };
+
+    filesystems {
+        fstab {
+            os_env_type = <1>;
+            system-vol {
+                vol.fs_type = "rw";
+                vol.fs_role = <1>;
+                vol.fs_name = "System";
+                vol.fs_file = "/";
+                vol.fs_passno = <1>;
+                vol.fs_mntorder = <0>;
+            };
+
+            preboot-vol {
+                vol.fs_mntopts = "nosuid,nodev,nobrowse";
+                vol.fs_type = "ro";
+                vol.fs_role = <0x10>;
+                vol.fs_file = "/private/preboot";
+            };
+        };
+    };
+};

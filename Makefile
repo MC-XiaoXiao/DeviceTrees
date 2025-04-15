@@ -3,12 +3,18 @@ CPP		= clang
 APPLEDTCDIR = dtc-AppleDeviceTree
 DTC		= $(APPLEDTCDIR)/dtc
 DEVICETREES	= RealView.devicetree Nokia_RX51.devicetree \
-	TI_BeagleXM.devicetree USBarmory_MkI.devicetree
+	TI_BeagleXM.devicetree USBarmory_MkI.devicetree \
+	Raspi3B.devicetree 
 
 all: APPLEDTC $(DEVICETREES)
 
 APPLEDTC:
 	make -C $(APPLEDTCDIR)
+
+Raspi3B.devicetree: ARM/Raspi3B/devicetree.dtsi
+	$(CPP) $(CPPFLAGS) $< -o $@.p
+	$(DTC) -O dtb -o $@ $@.p
+	rm -f $@.p
 
 RealView.devicetree: ARM/RealView-PB-A8/devicetree.dtsi
 	$(CPP) $(CPPFLAGS) $< -o $@.p
